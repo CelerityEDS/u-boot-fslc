@@ -1,0 +1,15 @@
+if TARGET_LOONSWITCH
+
+config SYS_BOARD
+	default "loonswitch"
+
+config SYS_VENDOR
+	default "google"
+
+config SYS_CONFIG_NAME
+	default "loonswitch"
+
+config BOARD_SPECIFIC_OPTIONS
+	def_bool y
+
+endif
