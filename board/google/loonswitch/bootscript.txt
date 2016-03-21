@@ -1,5 +1,8 @@
 setenv bootargs enable_wait_mode=off
 
+setenv fdtfile imx6q-loonswitch.dtb
+setenv fdtaddr 0x11000000
+
 setenv bootargs $bootargs
 setenv bootargs "$bootargs console=ttymxc1,115200 vmalloc=400M consoleblank=0 rootwait"
 
@@ -8,5 +11,5 @@ if test "sata" = "${dtype}" ; then
 else
 	setenv "bootargs $bootargs root=/dev/mmcblk0p1" ;
 fi
-${fs}load ${dtype} ${disk}:1 10800000 /boot/uImage && bootm 10800000 ;
+${fs}load ${dtype} ${disk}:1 10800000 /boot/zImage && ${fs}load ${dtype} ${disk}:1 ${fdtaddr} /boot/${fdtfile} && bootz 10800000 - ${fdtaddr};
 echo "Error loading kernel image"
