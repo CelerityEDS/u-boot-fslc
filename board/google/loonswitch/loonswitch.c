@@ -82,7 +82,7 @@ static iomux_v3_cfg_t const uart1_pads[] = {
 /* UART2 PINS */
 static iomux_v3_cfg_t const uart2_pads[] = {
 	MX6_PAD_SD4_DAT7__UART2_TX_DATA | MUX_PAD_CTRL(UART_PAD_CTRL),
-	MX6_PAD_SD4_DAT4__UART2_TX_DATA | MUX_PAD_CTRL(UART_PAD_CTRL),
+	MX6_PAD_SD4_DAT4__UART2_RX_DATA | MUX_PAD_CTRL(UART_PAD_CTRL),
 };
 
 /* UART3 PINS */
