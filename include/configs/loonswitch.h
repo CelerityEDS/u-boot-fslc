@@ -128,6 +128,14 @@
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	"bootdevs=" CONFIG_DRIVE_TYPES "\0" \
 	"umsdevs=" CONFIG_UMSDEVS "\0" \
+	"prepemmc=ums 0 mmc 2\0" \
+	"prepsd=ums 0  mmc 1\0" \
+	"updateflashfromemmc=if fatload mmc 2 0x10800000 u-boot.imx; then " \
+		"sf erase 0 0xc0000 && sf write 0x10800000 0x400 $filesize && " \
+		"echo flash is now updated ; fi\0" \
+	"bootfromemmc=fatload mmc 2 0x10800000 uImage; " \
+		"fatload mmc 2 0x12000000 imx6q-imx6com.dtb; " \
+		"bootm 0x10800000 - 0x12000000\0" \
 	"console=ttymxc1\0" \
 	"clearenv=if sf probe || sf probe || sf probe 1 ; then " \
 		"sf erase 0xc0000 0x2000 && " \
