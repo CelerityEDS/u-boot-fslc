@@ -27,7 +27,9 @@
 
 #define CONFIG_CMD_SF
 #ifdef CONFIG_CMD_SF
-#define CONFIG_SPI_FLASH_SST
+#define CONFIG_SPI_FLASH_STMICRO
+#define CONFIG_SPI_FLASH_ATMEL
+#define CONFIG_SPI_FLASH_MTD
 #define CONFIG_MXC_SPI
 #define CONFIG_SF_DEFAULT_BUS  2
 #define CONFIG_SF_DEFAULT_CS   0
@@ -50,6 +52,16 @@
 
 #ifdef CONFIG_MX6Q
 #define CONFIG_CMD_SATA
+#endif
+
+/* PCIe Configs */
+#define CONFIG_CMD_PCI
+#ifdef CONFIG_CMD_PCI
+#define CONFIG_PCI
+#define CONFIG_PCI_PNP
+#define CONFIG_PCI_SCAN_SHOW
+#define CONFIG_PCIE_IMX
+#define CONFIG_PCIE_IMX_PERST_GPIO    IMX_GPIO_NR(7, 12)
 #endif
 
 /*
