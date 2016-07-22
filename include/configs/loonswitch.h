@@ -55,6 +55,7 @@
 #endif
 
 /* PCIe Configs */
+/*
 #define CONFIG_CMD_PCI
 #ifdef CONFIG_CMD_PCI
 #define CONFIG_PCI
@@ -63,6 +64,7 @@
 #define CONFIG_PCIE_IMX
 #define CONFIG_PCIE_IMX_PERST_GPIO    IMX_GPIO_NR(7, 12)
 #endif
+ */
 
 /*
  * SATA Configs
@@ -113,7 +115,7 @@
 /* Miscellaneous commands */
 #define CONFIG_CMD_BMODE
 
-#define CONFIG_PREBOOT                 "usb start; setenv stdout serial; setenv stdin serial,usbkbd; echo Google, Inc. 2016"
+#define CONFIG_PREBOOT                 "setenv stdout serial; setenv stdin serial; echo Google, Inc. 2016"
 
 #ifdef CONFIG_CMD_SATA
 #define CONFIG_DRIVE_SATA "sata "
@@ -136,67 +138,43 @@
 #define CONFIG_DRIVE_TYPES CONFIG_DRIVE_SATA CONFIG_DRIVE_MMC CONFIG_DRIVE_USB
 #define CONFIG_UMSDEVS CONFIG_DRIVE_SATA CONFIG_DRIVE_MMC
 
-
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	"bootdevs=" CONFIG_DRIVE_TYPES "\0" \
 	"umsdevs=" CONFIG_UMSDEVS "\0" \
+	"bootdevice=emmc\0" \
+	"bootcmd=" \
+		"setenv fdt_high 0xffffffff ; " \
+		"setenv fdt_addr 0x13000000 ; " \
+		"setenv bootargs 'console=ttymxc0,115200n8 no_console_suspend " \
+		"root=/dev/mmcblk0p2 rw rootwait' ; " \
+		"saveenv ; " \
+		"if test \"${bootdevice}\" = \"emmc\"; then " \
+		"echo && echo Celerity iMX6COM -- Booting from eMMC Card... && " \
+		"run bootfromemmc; " \
+		"elif test \"${bootdevice}\" = \"usb\"; then " \
+		"echo && echo Celerity iMX6COM -- Booting from USB... && " \
+		"run bootfromusb; " \
+		"fi\0" \
 	"prepemmc=ums 0 mmc 2\0" \
 	"prepsd=ums 0  mmc 1\0" \
-	"updateflashfromemmc=if fatload mmc 2 0x10800000 u-boot.imx; then " \
-		"sf erase 0 0xc0000 && sf write 0x10800000 0x400 $filesize && " \
+	"updateflashfromusb=if fatload usb 0 0x10800000 u-boot.imx; then " \
+		"sf probe && sf erase 0 0xc0000 && sf write 0x10800000 0x400 $filesize && " \
 		"echo flash is now updated ; fi\0" \
-	"bootfromemmc=fatload mmc 2 0x10800000 uImage; " \
-		"fatload mmc 2 0x12000000 imx6q-imx6com.dtb; " \
-		"bootm 0x10800000 - 0x12000000\0" \
-	"console=ttymxc1\0" \
+	"updateflashfromemmc=if fatload mmc 2 0x10800000 u-boot.imx; then " \
+		"sf probe && sf erase 0 0xc0000 && sf write 0x10800000 0x400 $filesize && " \
+		"echo flash is now updated ; fi\0" \
 	"clearenv=if sf probe || sf probe || sf probe 1 ; then " \
 		"sf erase 0xc0000 0x2000 && " \
 		"echo restored environment to factory default ; fi\0" \
-	"bootcmd=for dtype in ${bootdevs}" \
-		"; do " \
-			"if itest.s \"xusb\" == \"x${dtype}\" ; then " \
-				"usb start ;" \
-			"fi; " \
-			"for disk in 0 1 ; do ${dtype} dev ${disk} ;" \
-				"load " \
-					"${dtype} ${disk}:1 " \
-					"10008000 " \
-					"/bootscript" \
-					"&& source 10008000 ; " \
-			"done ; " \
-		"done; " \
-		"setenv stdout serial ; " \
-		"echo ; echo bootscript not found ; " \
-		"echo ; echo serial console at 115200, 8N1 ; echo ; " \
-		"setenv stdout serial;" \
-		"setenv stdin serial,usbkbd;" \
-		"for dtype in ${umsdevs} ; do " \
-			"if itest.s sata == ${dtype}; then " \
-				"initcmd='sata init' ;" \
-			"else " \
-				"initcmd='mmc rescan' ;" \
-			"fi; " \
-			"for disk in 0 1 ; do " \
-				"if $initcmd && $dtype dev $disk ; then " \
-					"setenv stdout serial; " \
-					"echo expose ${dtype} ${disk} " \
-						"over USB; " \
-					"ums 0 $dtype $disk ;" \
-				"fi; " \
-		"	done; " \
-		"done ;" \
-		"setenv stdout serial; " \
-		"echo no block devices found;" \
-		"\0" \
-	"initrd_high=0xffffffff\0" \
-	"upgradeu=for dtype in ${bootdevs}" \
-		"; do " \
-		"for disk in 0 1 ; do ${dtype} dev ${disk} ;" \
-			"load ${dtype} ${disk}:1 10008000 " \
-				"/upgrade " \
-				"&& source 10008000 ; " \
-		"done ; " \
-	"done\0" \
+	"bootfromsd=fatload mmc 0 0x10800000 uImage; " \
+		"fatload mmc 0 0x12000000 imx6q-imx6com.dtb; " \
+		"bootm 0x10800000 - 0x12000000\0" \
+	"bootfromemmc=fatload mmc 2 0x10800000 uImage; " \
+		"fatload mmc 2 0x12000000 imx6q-imx6com.dtb; " \
+		"bootm 0x10800000 - 0x12000000\0" \
+	"bootfromusb=fatload usb 0 0x10800000 uImage; " \
+		"fatload usb 0 0x12000000 imx6q-imx6com.dtb; " \
+		"bootm 0x10800000 - 0x12000000\0" \
 
 /* Miscellaneous configurable options */
 #define CONFIG_SYS_MEMTEST_START       0x10000000
